@@ -51,6 +51,10 @@ int main(int argc, char **argv) {
     std::cout<<boptions<<std::endl;
     return 0;
   }
+  if(mvMap.count("msg-num"))
+  {
+    iMsgNum = mvMap["msg-num"].as<int>();
+  }
 
   if(mvMap.count("threads"))
   {
@@ -71,6 +75,12 @@ int main(int argc, char **argv) {
   
   //done checking parameters
   
+  //setting thread number
+  ff::rt::set_hardware_concurrency(iThreadNum);//Set concurrency
+  ff::para<> a;
+  a([]() {});
+  ff::ff_wait(a);
+  
   std::string output_file = "times.json";
   boost::property_tree::ptree pt;
   pt.put("time-unit", "us");
@@ -83,6 +93,7 @@ int main(int argc, char **argv) {
     end = std::chrono::system_clock::now();
     int64_t elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
     pt.put("time", elapsed);
+    std::cout<<"time: "<<elapsed <<" us"<<std::endl;
   };
   
   if (mvMap.count("serial"))
@@ -100,6 +111,5 @@ int main(int argc, char **argv) {
     time([iMsgNum, iThreadNum](){parallel(iMsgNum, iThreadNum, false);});
     return 0;
   }
-    std::cout << "Hello, world!" << std::endl;
     return 0;
 }
