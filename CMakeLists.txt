@@ -1,8 +1,8 @@
 project(ff_bq)
 add_definitions(-std=c++11)
+#add_definitions(-g)
 add_definitions(-O2)
 
-add_definitions(-DUSING_MIMO_QUEUE)
 include_directories(${PROJECT_SOURCE_DIR}/../ff/include)
 message(${PROJECT_SOURCE_DIR}/../ff/include)
 

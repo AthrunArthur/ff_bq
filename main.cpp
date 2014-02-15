@@ -108,7 +108,7 @@ int main(int argc, char **argv) {
   }
   if(mvMap.count("ff-lock"))
   {
-    time([iMsgNum, iThreadNum](){parallel(iMsgNum, iThreadNum, false);});
+    time([iMsgNum, iThreadNum](){parallel(iMsgNum, iThreadNum, true);});
     return 0;
   }
     return 0;

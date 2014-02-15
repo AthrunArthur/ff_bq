@@ -8,6 +8,7 @@
 
 #define MSG_LEN 1024
 #define MQ_LEN 4096
+#define Q_N 4
 
 class Msg {
 public:
@@ -38,8 +39,12 @@ public:
 
     virtual ~BQ()
     {
+	lock_out.lock();
+	lock_in.lock();
         delete[] pq_in;
         delete[] pq_out;
+	lock_in.unlock();
+	lock_out.unlock();
     }
 
     bool		pop_msg(Msg_ptr & msg)
@@ -122,6 +127,8 @@ void serial(int task_num)
 
     }
 }
+#define MIN_NUM 50000
+#define MAX_NUM 100000
 
 void parallel_bq(int msg_num, int thrd_num, BQ<ff::mutex> & bq)
 {
@@ -132,7 +139,7 @@ void parallel_bq(int msg_num, int thrd_num, BQ<ff::mutex> & bq)
     {
         std::random_device rd;
         std::default_random_engine dre(rd());
-        std::uniform_int_distribution<int> dist(1, 1000);
+        std::uniform_int_distribution<int> dist(MIN_NUM, MAX_NUM);
         int m = dist(dre);
 
         ff::para<> p;
@@ -178,7 +185,7 @@ void parallel_bq(int msg_num, int thrd_num, BQ<std::mutex> & bq)
     {
         std::random_device rd;
         std::default_random_engine dre(rd());
-        std::uniform_int_distribution<int> dist(1, 1000);
+        std::uniform_int_distribution<int> dist(MIN_NUM, MAX_NUM);
         int m = dist(dre);
 
         ff::para<> p;
@@ -216,16 +223,26 @@ void parallel_bq(int msg_num, int thrd_num, BQ<std::mutex> & bq)
 }
 void parallel(int msg_num, int thrd_num, bool ff_lock)
 {
+  int sub = msg_num/Q_N;
+  ff::paragroup pg;
+  for(int i = 0; i <Q_N; ++i)
+  {
+    ff::para<> p;
+    p([sub, thrd_num, ff_lock](){
     if(ff_lock)
     {
         BQ<ff::mutex> bq;
-        parallel_bq(msg_num, thrd_num, bq);
+        parallel_bq(sub, thrd_num, bq);
     }
     else
     {
         BQ<std::mutex> bq;
-        parallel_bq(msg_num, thrd_num, bq);
+        parallel_bq(sub, thrd_num, bq);
     }
+    });
+    pg.add(p);
+  }
+  ff::ff_wait(ff::all(pg));
 }
 
 
