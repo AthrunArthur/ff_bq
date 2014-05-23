@@ -6,7 +6,7 @@ import sys
 from email.mime.text import MIMEText
 
 
-msg_num = 100000000
+msg_num = 1000000
 max_thrd_num = 8
 
 def execute_cmd(cmd):
