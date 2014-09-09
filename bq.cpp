@@ -152,7 +152,7 @@ void parallel_bq(int msg_num, int thrd_num, BQ<ff::mutex> & bq)
         p([&bq, m]() {
             bq.in_lock().lock();
 #ifdef RECORD_LOCKS
-            RecordLocks::record(&(bq.in_lock()));
+            RecordLocks::record(&(bq.in_lock()), 1);
 #endif
             for(int i = 0; i < m; i ++)
             {
@@ -173,7 +173,7 @@ void parallel_bq(int msg_num, int thrd_num, BQ<ff::mutex> & bq)
         q([&bq, n]() {
             bq.out_lock().lock();
 #ifdef RECORD_LOCKS
-            RecordLocks::record(&(bq.in_lock()));
+            RecordLocks::record(&(bq.out_lock()), 0);
 #endif
             for(int i = 0; i<n; ++i)
             {
@@ -204,7 +204,7 @@ void parallel_bq(int msg_num, int thrd_num, BQ<std::mutex> & bq)
         p([&bq, m]() {
             bq.in_lock().lock();
 #ifdef RECORD_LOCKS
-            RecordLocks::record(&(bq.in_lock()));
+            RecordLocks::record(&(bq.in_lock()), 1);
 #endif
             for(int i = 0; i < m; i ++)
             {
@@ -225,7 +225,7 @@ void parallel_bq(int msg_num, int thrd_num, BQ<std::mutex> & bq)
         q([&bq, n]() {
             bq.out_lock().lock();
 #ifdef RECORD_LOCKS
-            RecordLocks::record(&(bq.in_lock()));
+            RecordLocks::record(&(bq.out_lock()), o);
 #endif
             for(int i = 0; i<n; ++i)
             {

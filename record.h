@@ -14,13 +14,14 @@ namespace RecordLocks{
     struct LockAndThrd{
         intptr_t lock;
         int32_t   thrd;
+        int additional;
     };
     
     extern std::map<LockAndThrd, int64_t, 
         std::function<bool (const LockAndThrd &, 
                             const LockAndThrd &)> > g_olockTimes;
     
-    void record(void * lock_ptr);
+    void record(void * lock_ptr, int additional);
     
     void close_records();
     

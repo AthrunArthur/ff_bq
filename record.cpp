@@ -17,11 +17,12 @@ namespace RecordLocks{
                                 }
                             );
 
-    void record(void * lock_ptr)
+    void record(void * lock_ptr, int additional)
     {
         LockAndThrd lt;
         lt.lock = reinterpret_cast<intptr_t>(lock_ptr);
         lt.thrd = ff::rt::get_thrd_id();
+        lt.additional = additional
         g_olockTimes[lt] ++;
     }
     
@@ -31,7 +32,7 @@ namespace RecordLocks{
         for (auto it = g_olockTimes.begin(); it != g_olockTimes.end(); ++it)
         {
             const LockAndThrd & lt = (*it).first;
-            f<<lt.lock<<"\t"<<lt.thrd<<"\t"<<(*it).second<<std::endl;
+            f<<lt.lock<<"\t"<<lt.thrd<<"\t"<<lt.additional<<"\t"<<(*it).second<<std::endl;
         }
         f.close();
     }
