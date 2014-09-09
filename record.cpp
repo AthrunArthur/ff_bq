@@ -10,7 +10,10 @@ namespace RecordLocks{
                                 {
                                     if(l1.lock < l2.lock)
                                         return true;
-                                    else if(l1.lock == l2.lock && l1.thrd < l1.thrd)
+                                    else if(l1.lock == l2.lock && l1.thrd < l2.thrd)
+                                        return true;
+                                    else if(l1.lock == l2.lock && l1.thrd == l2.thrd &&
+                                        l1.additional < l2.additional)
                                         return true;
                                     else
                                         return false;
@@ -22,7 +25,7 @@ namespace RecordLocks{
         LockAndThrd lt;
         lt.lock = reinterpret_cast<intptr_t>(lock_ptr);
         lt.thrd = ff::rt::get_thrd_id();
-        lt.additional = additional
+        lt.additional = additional;
         g_olockTimes[lt] ++;
     }
     
