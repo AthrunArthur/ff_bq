@@ -10,6 +10,12 @@
 #define MQ_LEN 4096
 #define Q_N 4
 
+#define RECORD_LOCKS
+#ifdef RECORD_LOCKS
+#include "record.h"
+#endif
+
+
 class Msg {
 public:
     Msg():content(MSG_LEN) {
@@ -145,6 +151,9 @@ void parallel_bq(int msg_num, int thrd_num, BQ<ff::mutex> & bq)
         ff::para<> p;
         p([&bq, m]() {
             bq.in_lock().lock();
+#ifdef RECORD_LOCKS
+            RecordLocks::record(&(bq.in_lock()));
+#endif
             for(int i = 0; i < m; i ++)
             {
                 Msg_ptr msg = std::make_shared<Msg>();
@@ -163,6 +172,9 @@ void parallel_bq(int msg_num, int thrd_num, BQ<ff::mutex> & bq)
         ff::para<> q;
         q([&bq, n]() {
             bq.out_lock().lock();
+#ifdef RECORD_LOCKS
+            RecordLocks::record(&(bq.in_lock()));
+#endif
             for(int i = 0; i<n; ++i)
             {
                 Msg_ptr msg;
@@ -191,6 +203,9 @@ void parallel_bq(int msg_num, int thrd_num, BQ<std::mutex> & bq)
         ff::para<> p;
         p([&bq, m]() {
             bq.in_lock().lock();
+#ifdef RECORD_LOCKS
+            RecordLocks::record(&(bq.in_lock()));
+#endif
             for(int i = 0; i < m; i ++)
             {
                 Msg_ptr msg = std::make_shared<Msg>();
@@ -209,6 +224,9 @@ void parallel_bq(int msg_num, int thrd_num, BQ<std::mutex> & bq)
         ff::para<> q;
         q([&bq, n]() {
             bq.out_lock().lock();
+#ifdef RECORD_LOCKS
+            RecordLocks::record(&(bq.in_lock()));
+#endif
             for(int i = 0; i<n; ++i)
             {
                 Msg_ptr msg;

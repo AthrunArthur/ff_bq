@@ -8,6 +8,7 @@
 #include <chrono>
 #include <functional>
 #include <ff.h>
+#include "record.h"
 
 
 
@@ -80,6 +81,9 @@ int main(int argc, char **argv) {
   ff::para<> a;
   a([]() {});
   ff::ff_wait(a);
+  ff::scope_guard _l([](){}, [](){
+      RecordLocks::close_records();
+      });
   
   std::string output_file = "times.json";
   boost::property_tree::ptree pt;
