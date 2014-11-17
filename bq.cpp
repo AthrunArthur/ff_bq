@@ -140,7 +140,7 @@ void parallel_bq(int msg_num, int thrd_num, BQ<ff::mutex> & bq)
 {
     int iMsg_num = 0;
 
-    ff::paragroup pg;
+    ff::paracontainer pg;
     while(iMsg_num < msg_num)
     {
         std::random_device rd;
@@ -192,7 +192,7 @@ void parallel_bq(int msg_num, int thrd_num, BQ<std::mutex> & bq)
 {
     int iMsg_num = 0;
 
-    ff::paragroup pg;
+    ff::paracontainer pg;
     while(iMsg_num < msg_num)
     {
         std::random_device rd;
@@ -242,7 +242,7 @@ void parallel_bq(int msg_num, int thrd_num, BQ<std::mutex> & bq)
 void parallel(int msg_num, int thrd_num, bool ff_lock)
 {
   int sub = msg_num/Q_N;
-  ff::paragroup pg;
+  ff::paracontainer pg;
   for(int i = 0; i <Q_N; ++i)
   {
     ff::para<> p;
