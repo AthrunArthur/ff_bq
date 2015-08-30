@@ -5,6 +5,7 @@
 #include <mutex>
 #include <random>
 #include <ff.h>
+#include <smt.h>
 
 #define MSG_LEN 1024
 #define MQ_LEN 4096
@@ -135,7 +136,7 @@ void serial(int task_num)
 }
 #define MIN_NUM 50000
 #define MAX_NUM 100000
-
+/*
 void parallel_bq(int msg_num, int thrd_num, BQ<ff::mutex> & bq)
 {
     int iMsg_num = 0;
@@ -187,7 +188,7 @@ void parallel_bq(int msg_num, int thrd_num, BQ<ff::mutex> & bq)
     }
     ff::ff_wait(ff::all(pg));
 }
-
+*/
 void parallel_bq(int msg_num, int thrd_num, BQ<std::mutex> & bq)
 {
     int iMsg_num = 0;
@@ -202,16 +203,23 @@ void parallel_bq(int msg_num, int thrd_num, BQ<std::mutex> & bq)
 
         ff::para<> p;
         p([&bq, m]() {
-            bq.in_lock().lock();
+            start_exe_task();
 #ifdef RECORD_LOCKS
             RecordLocks::record(&(bq.in_lock()), 1);
 #endif
             for(int i = 0; i < m; i ++)
             {
                 Msg_ptr msg = std::make_shared<Msg>();
+                pause_exe_task();
+                bq.in_lock().lock();
+                start_hold_mutex(&(bq.in_lock()));
+
                 bq.push_msg(msg);
+                end_hold_mutex(&(bq.in_lock()));
+                bq.in_lock().unlock();
+                start_exe_task();
             }
-            bq.in_lock().unlock();
+            pause_exe_task();
         });
         pg.add(p);
 
@@ -247,16 +255,18 @@ void parallel(int msg_num, int thrd_num, bool ff_lock)
   {
     ff::para<> p;
     p([sub, thrd_num, ff_lock](){
+        start_exe_task();
     if(ff_lock)
     {
-        BQ<ff::mutex> bq;
-        parallel_bq(sub, thrd_num, bq);
+ //       BQ<ff::mutex> bq;
+ //       parallel_bq(sub, thrd_num, bq);
     }
     else
     {
         BQ<std::mutex> bq;
         parallel_bq(sub, thrd_num, bq);
     }
+    pause_exe_task();
     });
     pg.add(p);
   }

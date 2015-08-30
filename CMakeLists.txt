@@ -3,14 +3,16 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 add_definitions(-std=c++11)
 #add_definitions(-g)
 add_definitions(-O2)
-add_definitions(-DUSING_FF_NONBLOCKING_QUEUE)
+add_definitions(-DUSING_WORK_STEALING_QUEUE)
 add_definitions(-DNDEBUG)
 
 include_directories(${PROJECT_SOURCE_DIR}/../ff/include)
+include_directories(${PROJECT_SOURCE_DIR}/../statistic_mutex_time/)
 message(${PROJECT_SOURCE_DIR}/../ff/include)
 
-set(LIBS_LINK_LIBS ff pthread)
+set(LIBS_LINK_LIBS ff pthread smt)
 link_directories(${PROJECT_SOURCE_DIR}/../bin)
+link_directories(${PROJECT_SOURCE_DIR}/../statistic_mutex_time/build/)
 
 if(CACHE_EVAL)
   add_definitions(-DCACHE_EVAL)

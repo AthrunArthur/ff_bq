@@ -8,6 +8,7 @@
 #include <chrono>
 #include <functional>
 #include <ff.h>
+#include <smt.h>
 #include "record.h"
 #ifdef CACHE_EVAL
 #include <papi.h>
@@ -80,7 +81,7 @@ int main(int argc, char **argv) {
 	//done checking parameters
 
 	//setting thread number
-	ff::rt::set_hardware_concurrency(iThreadNum);//Set concurrency
+	ff::rt::set_concurrency(iThreadNum);//Set concurrency
 	ff::para<> a;
 	a([]() {});
 	ff::ff_wait(a);
@@ -145,12 +146,13 @@ int main(int argc, char **argv) {
 		assert(retVal == PAPI_OK);
 		retVal = PAPI_destroy_eventset(&EventSet);
 		assert(retVal == PAPI_OK);
-		PAPI_shutdown(); 
+		PAPI_shutdown();
 		//L2 result
 		std::cout << "L2 total cache miss = " << endRecords[0] - startRecords[0] << std::endl;
 		std::cout << "L2 total cache access = " << endRecords[1] - startRecords[1] << std::endl;
 		/*Stop papi trace*/
-#endif 
+#endif
+    print_results();
 		return 0;
 	}
 	return 0;
